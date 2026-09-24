@@ -1,6 +1,6 @@
 def checkmate(board):
     if not isinstance(board, str) or not board:
-        print("Error")
+        print("Error: board must be a valid non-empty string")
         return
 
     lines = board.splitlines()
@@ -11,13 +11,13 @@ def checkmate(board):
 
     size = len(lines)
     if size == 0:
-        print("Error")
+        print("Error: board cannot be empty")
         return
 
     # Check if the board is square
     for row in lines:
         if len(row) != size:
-            print("Error")
+            print(f"Error: board must be square ({size}x{size}), but found a row with length {len(row)}")
             return
 
     # Find King's position and verify there is exactly one King
@@ -31,8 +31,11 @@ def checkmate(board):
                 king_pos = (r, c)
                 king_count += 1
 
-    if king_count != 1 or king_pos is None:
-        print("Error")
+    if king_count == 0:
+        print("Error: King ('K') not found on the board")
+        return
+    elif king_count > 1:
+        print(f"Error: board must contain exactly one King ('K'), but found {king_count}")
         return
 
     kr, kc = king_pos

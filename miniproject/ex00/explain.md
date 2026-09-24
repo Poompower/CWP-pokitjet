@@ -43,7 +43,7 @@ if __name__ == "__main__":
 ```python
 def checkmate(board):
     if not isinstance(board, str) or not board:
-        print("Error")
+        print("Error: board must be a valid non-empty string")
         return
 
     lines = board.splitlines()
@@ -54,23 +54,23 @@ def checkmate(board):
 
     size = len(lines)
     if size == 0:
-        print("Error")
+        print("Error: board cannot be empty")
         return
 
     # Check if the board is square
     for row in lines:
         if len(row) != size:
-            print("Error")
+            print(f"Error: board must be square ({size}x{size}), but found a row with length {len(row)}")
             return
 ```
 
 - **บรรทัดที่ 1 (`def checkmate(board):`):** ประกาศฟังก์ชัน `checkmate` รับพารามิเตอร์ `board` (ข้อความกระดานหมากรุก)
-- **บรรทัดที่ 2 - 4 (`if not isinstance(board, str) or not board:`):** ตรวจสอบว่าถ้า `board` ไม่ใช่ข้อความ (String) หรือส่งค่าว่าง (`None`, `""`) มา ให้พิมพ์ `"Error"` แล้วหยุดทำงานทันที
+- **บรรทัดที่ 2 - 4 (`if not isinstance(board, str) or not board:`):** ตรวจสอบว่าถ้า `board` ไม่ใช่ข้อความ (String) หรือส่งค่าว่าง (`None`, `""`) มา ให้พิมพ์แจ้งเตือน `"Error: board must be a valid non-empty string"` แล้วหยุดทำงานทันที
 - **บรรทัดที่ 6 - 10 (`lines = board.splitlines()...`):**
   - ตัดข้อความกระดานออกเป็นแถวๆ เก็บใน List `lines`
   - ลบบรรทัดว่างเปล่าที่อาจติดมาที่หัวหรือท้ายสุดของข้อความออกไป
-- **บรรทัดที่ 12 - 15 (`size = len(lines)...`):** นับจำนวนแถวเก็บไว้ในตัวแปร `size` (เช่น กระดาน 4x4 ค่า `size` จะเท่ากับ `4`) ถ้าไม่มีแถวเลย (`size == 0`) ให้พิมพ์ `"Error"` แล้วหยุดทำงาน
-- **บรรทัดที่ 18 - 21 (`for row in lines: if len(row) != size: ...`):** วนลูปเช็คความยาวของทุกๆ แถวว่าเท่ากับ `size` หรือไม่ (ตามกฎ กระดานต้องเป็น **สี่เหลี่ยมจัตุรัส** เช่น 4x4, 8x8) ถ้ามีแถวไหนยาวไม่เท่ากัน ให้พิมพ์ `"Error"` แล้วหยุดทำงาน
+- **บรรทัดที่ 12 - 15 (`size = len(lines)...`):** นับจำนวนแถวเก็บไว้ในตัวแปร `size` ถ้าไม่มีแถวเลย ให้พิมพ์แจ้งเตือน `"Error: board cannot be empty"` แล้วหยุดทำงาน
+- **บรรทัดที่ 18 - 21 (`for row in lines: if len(row) != size: ...`):** วนลูปเช็คความยาวของทุกๆ แถวว่าเท่ากับ `size` หรือไม่ (กระดานต้องเป็นสี่เหลี่ยมจัตุรัส $N \times N$) ถ้ามีแถวไหนยาวไม่เท่ากัน ให้พิมพ์แจ้งเตือนพร้อมบอกขนาดที่ผิดพลาด เช่น `"Error: board must be square (4x4), but found a row with length 3"` แล้วหยุดทำงาน
 
 ---
 
@@ -88,8 +88,11 @@ def checkmate(board):
                 king_pos = (r, c)
                 king_count += 1
 
-    if king_count != 1 or king_pos is None:
-        print("Error")
+    if king_count == 0:
+        print("Error: King ('K') not found on the board")
+        return
+    elif king_count > 1:
+        print(f"Error: board must contain exactly one King ('K'), but found {king_count}")
         return
 
     kr, kc = king_pos
@@ -100,8 +103,10 @@ def checkmate(board):
   - `king_count`: ตัวนับจำนวน King ในกระดาน
   - `pieces`: Set ของตัวหมากทั้งหมด เพื่อใช้เช็คว่าช่องไหนมีตัวหมากมาขวางทาง
 - **บรรทัดที่ 29 - 33:** วนลูปดูทุกช่องในกระดาน (แถว `r`, คอลัมน์ `c`) ถ้าเจอตัวอักษร `'K'` ให้จำพิกัด `(r, c)` เก็บไว้ใน `king_pos` และบวกตัวนับ `king_count` เพิ่มขึ้น 1
-- **บรรทัดที่ 35 - 37:** ตามกฎ ในกระดานต้องมี King **เป๊ะๆ 1 ตัวเท่านั้น** ถ้าไม่มี King เลย หรือมี 2 ตัวขึ้นไป ให้พิมพ์ `"Error"` แล้วหยุดทำงาน
-- **บรรทัดที่ 39 (`kr, kc = king_pos`):** แตกพิกัด King ออกมาเก็บเป็นตัวแปร `kr` (แถวของ King) และ `kc` (คอลัมน์ของ King)
+- **บรรทัดที่ 35 - 40:** ตรวจสอบจำนวน King ในกระดาน:
+  - ถ้าไม่มี King (`king_count == 0`) ➡️ พิมพ์ `"Error: King ('K') not found on the board"`
+  - ถ้ามี King มากกว่า 1 ตัว (`king_count > 1`) ➡️ พิมพ์ `"Error: board must contain exactly one King ('K'), but found X"`
+- **บรรทัดที่ 42 (`kr, kc = king_pos`):** แตกพิกัด King ออกมาเก็บเป็นตัวแปร `kr` (แถวของ King) และ `kc` (คอลัมน์ของ King)
 
 ---
 
